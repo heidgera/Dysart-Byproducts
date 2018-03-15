@@ -19,23 +19,56 @@ body {
   background-color: #2a2a2a;
 }
 
-#outer {
-  position: absolute;
-  top:0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  width:90vmin;
-  height: 90vmin;
-  background-color: #fff;
-  border-radius: 45vmin;
+.tower {
+	position: relative;
+  width: 90vw;
+	height: 10vh;
+	margin: 5vw;
+	line-height: 10vh;
+	--gradient: linear-gradient(to right, rgb(255,0,0), rgb(0,0,255));
 }
 
-#track {
-  position: absolute;
-  width:10px;
-  height: 10px;
-  border-radius: 5px;
-  background-color: #f00;
+.swatch {
+	position: absolute;
+	display: inline-block;
+	width: 10vh;
+	height: 10vh;
+	left: 0;
+	border-radius: 1vh;
+	background-color: #fff;
+	z-index: -100;
+	/* transition: background-color .1s; */
+}
+
+.spectrum {
+	display: inline-block;
+	position: absolute;
+	left: 10vh;
+	width: 70vw;
+	height: 4vh;
+	margin-left: 5vw;
+	vertical-align: top;
+	z-index: 0;
+	background: var(--gradient);
+}
+
+.marker {
+	position: absolute;
+	left: 0;
+	top:0;
+	height: 4vh;
+	width: 1px;
+	/* background-color: #000; */
+	border: 2px solid #000;
+}
+
+.marker > div {
+	position: absolute;
+	left: -3px;
+	top: -6px;
+	width:6px;
+	height: 6px;
+	background-color: #fff;
+	border-radius: 3px;
+	border: 1px solid #000;
 }

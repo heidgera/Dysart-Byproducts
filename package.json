@@ -17,9 +17,15 @@
     "electron": "1.7.5"
   },
   "dependencies": {
+    "body-parser": "^1.18.2",
     "express": "^4.15.4",
+    "fivetwelve": "^0.9.4",
+    "fivetwelve-driver-usbpro": "^1.0.2",
+    "google-auth-library": "^1.2.1",
+    "googleapis": "^25.0.0",
+    "nodemailer": "^4.4.2",
     "path": "^0.12.7",
-    "serialport": "^5.0.0",
+    "serialport": "^5.0.0-beta3",
     "ws": "^3.1.0"
   }
 }
