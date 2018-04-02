@@ -20,6 +20,7 @@ obtain(obtains, ({ towers }, { Color }, io)=> {
 
   exports.app.start = ()=> {
     io.onChange = (val)=> {
+      console.log(`Pin is now ${val}`);
       if (val) towers.runtime = 900000;
       else towers.runtime = 10800000;
       towers.run();
@@ -39,7 +40,7 @@ obtain(obtains, ({ towers }, { Color }, io)=> {
                         Color('25b7db'), Color('23d2e2'), Color('22d688'),
                         Color('21be25'), Color('dddf31'),
                         Color('fff837'), Color('fff837'), Color('fec62e'), Color('fec62e'), Color('f97822'), Color('f97822'),
-                        Color('e83a1a'), Color('e83a1a'), Color('d12c1b'), Color('d12c1b'),]);
+                        Color('e83a1a'), Color('e83a1a'), Color('d12c1b'), Color('d12c1b'), ]);
     // towers.setSpectrum([Color([212, 117, 215]), Color([139, 60, 183]), Color([51, 45, 149]),
     //                     Color([38, 186, 223]), Color('8b3cb7'), Color([33, 190, 37]),
     //                     Color([111, 205, 39]), Color([255, 255, 56]), Color([208, 41, 24]), ]);
