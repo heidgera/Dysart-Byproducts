@@ -9,24 +9,42 @@ var process = remote.process;
 var obtains = [
   `${__dirname}/towers.js`,
   'µ/color.js',
+  //`${__dirname}/stateManager.js`,
 ];
 
-obtain(obtains, ({ towers }, { Color })=> {
+obtain(obtains, ({ towers }, { Color }, io)=> {
 
   exports.app = {};
 
   var sent = false;
 
   exports.app.start = ()=> {
+    /*io.onChange = (val)=> {
+      if (val) towers.runtime = 900000;
+      else towers.runtime = 10800000;
+      towers.run();
+    };
+
+    io.onStop = (cb)=> {
+      towers.forceColor('#f00');
+      setTimeout(cb, 1000);
+    };
+
+    io.forceCheck();*/
 
     towers.start();
-    towers.setSpectrum([Color([255, 0, 50]), Color([50, 0, 255])]);
-    // towers.setSpectrum([Color([255, 0, 0]), Color([255, 127, 0]), Color([255, 255, 0]),
-    //                     Color([127, 255, 0]), Color([0, 255, 0]), Color([0, 255, 127]),
-    //                     Color([0, 255, 255]), Color([0, 127, 255]), Color([0, 0, 255]),
-    //                     Color([127, 0, 255]), Color([255, 0, 255]), Color([255, 0, 127]), ]);
+    //towers.setSpectrum([Color([255, 0, 50]), Color([50, 0, 255])]);
+    towers.setSpectrum([Color('d475d7'), Color('d475d7'), Color('bc5dc4'), Color('bc5dc4'), Color('8b3cb7'), Color('8b3cb7'),
+                        Color('6227a7'), Color('6227a7'), Color('372995'), Color('1f5dbb'),
+                        Color('25b7db'), Color('23d2e2'), Color('22d688'),
+                        Color('21be25'), Color('dddf31'),
+                        Color('fff837'), Color('fff837'), Color('fec62e'), Color('fec62e'), Color('f97822'), Color('f97822'),
+                        Color('e83a1a'), Color('e83a1a'), Color('d12c1b'), Color('d12c1b'),]);
+    // towers.setSpectrum([Color([212, 117, 215]), Color([139, 60, 183]), Color([51, 45, 149]),
+    //                     Color([38, 186, 223]), Color('8b3cb7'), Color([33, 190, 37]),
+    //                     Color([111, 205, 39]), Color([255, 255, 56]), Color([208, 41, 24]), ]);
     console.log('started');
-    towers.runtime = 10800000;//168750;
+    towers.runtime = 168750 * 64;//10800000;//
 
     document.onkeypress = (e)=> {
       if (e.key == ' ') towers.run();
@@ -42,6 +60,7 @@ obtain(obtains, ({ towers }, { Color })=> {
     };
 
     process.on('SIGINT', ()=> {
+      io.close();
       process.nextTick(function () { process.exit(0); });
     });
   };

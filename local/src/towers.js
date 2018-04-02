@@ -108,8 +108,8 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
 
       console.log(`max start year: ${maxStartYear}, min end year: ${minLastYear}`);
 
-      var min = -5;//this.sets.map(set=>set.min()).min();
-      var max = 5; //this.sets.map(set=>set.max()).max();
+      var min = -8;//this.sets.map(set=>set.daily.min()).min();//
+      var max = 8; //this.sets.map(set=>set.daily.max()).max();//
 
       this.sets.forEach((set, i, arr)=> {
         set.scaled = set.daily.map(point=>Math.min(1, Math.max((point - min) / (max - min), 0)));
@@ -159,6 +159,13 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
 
     },
 
+    forceColor(color) {
+      clearInterval(_this.runInterval);
+      _this.sets.forEach((set, ind)=> {
+        set.device.color(color);
+      });
+    },
+
     run() {
       console.log('run');
       var _this = this;
@@ -190,8 +197,8 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
             set.current = set.scaled[_this.index] + diff * (pointCount / framesPerPoint);
             set.display.marker.style.left = Math.floor(set.current * 100) + '%';
             set.display.swatch.style.backgroundColor = fadeColors(_this.colors, set.current).styleString();
-            set.display.swatch.style.width = (5 + 20 * set.device.zoom) + 'vh';
-            set.display.swatch.style.height = (5 + 20 * set.device.zoom) + 'vh';
+            //set.display.swatch.style.width = (5 + 20 * set.device.zoom) + 'vh';
+            //set.display.swatch.style.height = (5 + 20 * set.device.zoom) + 'vh';
             set.device.color = fadeColors(_this.colors, set.current).styleString();
           }
         });
