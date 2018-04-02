@@ -9,7 +9,7 @@ var process = remote.process;
 var obtains = [
   `${__dirname}/towers.js`,
   'µ/color.js',
-  //`${__dirname}/stateManager.js`,
+  `${__dirname}/stateManager.js`,
 ];
 
 obtain(obtains, ({ towers }, { Color }, io)=> {
@@ -19,7 +19,7 @@ obtain(obtains, ({ towers }, { Color }, io)=> {
   var sent = false;
 
   exports.app.start = ()=> {
-    /*io.onChange = (val)=> {
+    io.onChange = (val)=> {
       if (val) towers.runtime = 900000;
       else towers.runtime = 10800000;
       towers.run();
@@ -30,7 +30,7 @@ obtain(obtains, ({ towers }, { Color }, io)=> {
       setTimeout(cb, 1000);
     };
 
-    io.forceCheck();*/
+    io.forceCheck();
 
     towers.start();
     //towers.setSpectrum([Color([255, 0, 50]), Color([50, 0, 255])]);
