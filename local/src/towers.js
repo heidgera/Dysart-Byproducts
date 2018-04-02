@@ -160,9 +160,9 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
     },
 
     forceColor(color) {
-      clearInterval(_this.runInterval);
-      _this.sets.forEach((set, ind)=> {
-        set.device.color(color);
+      clearInterval(this.runInterval);
+      this.sets.forEach((set, ind)=> {
+        set.device.color = color;
       });
     },
 
