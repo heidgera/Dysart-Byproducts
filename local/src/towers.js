@@ -166,6 +166,10 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
       });
     },
 
+    stop() {
+      if (this.runInterval) clearInterval(this.runInterval);
+    },
+
     run() {
       console.log('run');
       var _this = this;
@@ -208,7 +212,7 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
         pointCount = (pointCount + 1) % framesPerPoint;
         if (pointCount == 0) _this.index++;
         //_this.index++;
-        if (_this.index >= len) clearInterval(_this.runInterval);
+        if (_this.index >= len) _this.index = 0;//clearInterval(_this.runInterval);
       }, 1000 / fps); //_this.period
     },
   };

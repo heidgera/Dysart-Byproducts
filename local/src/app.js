@@ -19,16 +19,26 @@ obtain(obtains, ({ towers }, { Color }, io)=> {
   var sent = false;
 
   exports.app.start = ()=> {
+    var blink = 0;
+    var runTO = 0;
     io.onChange = (val)=> {
       console.log(`Pin is now ${val}`);
       if (val) towers.runtime = 900000;
       else towers.runtime = 10800000;
-      towers.run();
+      var state = 0;
+      clearInterval(blink);
+      clearTimeout(runTO);
+      blink = setInterval(()=> {
+        if (state) towers.forceColor('#0f0');
+        else towers.forceColor('#f0f');
+        state = !state;
+      }, 250);
+      runTO = setTimeout(towers.run.bind(towers), 3000);
     };
 
     io.onStop = (cb)=> {
       towers.forceColor('#f00');
-      setTimeout(cb, 1000);
+      //setTimeout(cb, 1000);
     };
 
     io.forceCheck();
