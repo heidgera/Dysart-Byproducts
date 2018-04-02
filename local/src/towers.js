@@ -61,7 +61,7 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
       var dir = `${__dirname}/../assets/data/`;
       this.sets = fs.readdirSync(dir).map(name=>load(dir + name));
 
-      _this.serial = new Serialport('/dev/tty.usbserial-EN228752');
+      _this.serial = new Serialport('/dev/ttyUSB0'); //'/dev/tty.usbserial-EN228752'
 
       // _this.serial.pipe(parser);
       //
