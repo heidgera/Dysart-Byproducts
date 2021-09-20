@@ -180,11 +180,17 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
             //var color = fadeColors(show.spectrum, current);
             color = color.scale(blk);
             _this.lights.forEach(light => {
-              if(light.channel == i){
-                light.color = color.styleString();
-                //var current = (next.norm[i]*(prc) + point.norm[i]*(1-prc));
-                light.display.marker.style.left = Math.floor(current * 100) + '%';
+              var adjHours = (new Date(_this.getTime())).getHours();
+              if(adjHours >= _this.config.active.start && adjHours < _this.config.active.end){
+                if(light.channel == i){
+                  light.color = color.styleString();
+                  //var current = (next.norm[i]*(prc) + point.norm[i]*(1-prc));
+                  light.display.marker.style.left = Math.floor(current * 100) + '%';
+                }
+              } else {
+                light.color = "#000000";
               }
+
             });
 
 
