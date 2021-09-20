@@ -15,11 +15,12 @@ var obtains = [
   'os',
   'path',
   'fs',
-  'serialport'
+  'serialport',
+  'child_process'
   /*`${__dirname}/stateManager.js`,*/
 ];
 
-obtain(obtains, ({ ShowControl }, { Color }, {fileServer}, {wss}, {MotorControl}, os, path, fs, serial/*, io*/)=> {
+obtain(obtains, ({ ShowControl }, { Color }, {fileServer}, {wss}, {MotorControl}, os, path, fs, serial, {execSync}/*, io*/)=> {
   var spectrum = [ Color('8b3cb7'), Color('8b3cb7'),
                           Color('6227a7'), Color('6227a7'), Color('372995'), Color('1f5dbb'),
                           Color('25b7db'), Color('23d2e2'), Color('22d688'),
@@ -27,7 +28,7 @@ obtain(obtains, ({ ShowControl }, { Color }, {fileServer}, {wss}, {MotorControl}
                           Color('fff837'), Color('fff837'), Color('fec62e'), Color('fec62e'), Color('f97822'), Color('f97822'),
                           Color('e83a1a'), Color('e83a1a'), Color('d12c1b'), Color('d12c1b'),];
   var configFile = `${__dirname}/../../config/showControl.json`
-  if(os.platform == 'linux') configFile = '/boot/showControl.json';
+  if(os.platform() == 'linux') configFile = '/boot/showControl.json';
 
   configFile = path.resolve(configFile);
 
@@ -86,6 +87,10 @@ obtain(obtains, ({ ShowControl }, { Color }, {fileServer}, {wss}, {MotorControl}
 
     wss.addListener('setTime', ({details, data})=>{
       control.setTime(data.time);
+    });
+
+    wss.addListener('shutdown', ({details, data})=>{
+      if(os.platform() == 'linux') execSync('sudo shutdown now');
     });
 
     wss.addListener('writeConfig', ({details, data})=>{

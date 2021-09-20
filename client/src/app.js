@@ -55,6 +55,10 @@ obtain(['µ/commandClient.js'], ({ MuseControl })=> {
       })
     }
 
+    µ('#shutdown').onclick = ()=>{
+      control.send('shutdown', {});
+    }
+
     µ('#play').onclick = ()=>{
       console.log("start show");
       control.send('startShow',{});
