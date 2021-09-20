@@ -187,10 +187,12 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
             let next = _this.nextPoint(_this.showIndex,which);
             var pScale = (point.raw[i]==0)?0:1;
             var nScale = (next.raw[i]==0)?0:1;
+            var blk = pScale*(1-prc) + nScale*prc;
             //if(i && last != point.raw[i]) last=point.raw[i],console.log(point.raw[i], elapsed/show.duration);
             //var color = fadeColors([point.colors[i].scale(pScale), next.colors[i].scale(nScale)], prc);
             var current = (next.norm[i]*(prc) + point.norm[i]*(1-prc));
             var color = fadeColors(show.spectrum, current);
+            color = color.scale(blk);
             _this.lights.forEach(light => {
               if(light.channel == i){
                 light.color = color.styleString();
