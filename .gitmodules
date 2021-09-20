@@ -4,3 +4,6 @@
 [submodule "piFig"]
 	path = piFig
 	url = https://github.com/heidgera/piFig
+[submodule "local/src/MuseServer"]
+	path = local/src/MuseServer
+	url = https://github.com/heidgera/MuseServer

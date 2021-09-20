@@ -17,8 +17,14 @@
     "electron": "1.7.5"
   },
   "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "express-fileupload": "^0.4.0",
+    "express-session": "^1.15.6",
+    "express-subdomain": "^1.0.5",
     "fivetwelve": "^0.9.4",
     "fivetwelve-driver-usbpro": "^1.0.2",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "ws": "^3.1.0"
   }
 }

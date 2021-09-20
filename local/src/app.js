@@ -9,86 +9,144 @@ var process = remote.process;
 var obtains = [
   `${__dirname}/byproduct.js`,
   'µ/color.js',
+  './src/MuseServer/express.js',
+  './src/MuseServer/wsServer.js',
+  './src/controller.js',
+  'os',
+  'path',
+  'fs'
   /*`${__dirname}/stateManager.js`,*/
 ];
 
-obtain(obtains, ({ ShowControl }, { Color }/*, io*/)=> {
+obtain(obtains, ({ ShowControl }, { Color }, {fileServer}, {wss}, {MotorControl}, os, path, fs/*, io*/)=> {
+  var spectrum = [ Color('8b3cb7'), Color('8b3cb7'),
+                          Color('6227a7'), Color('6227a7'), Color('372995'), Color('1f5dbb'),
+                          Color('25b7db'), Color('23d2e2'), Color('22d688'),
+                          Color('21be25'), Color('dddf31'),
+                          Color('fff837'), Color('fff837'), Color('fec62e'), Color('fec62e'), Color('f97822'), Color('f97822'),
+                          Color('e83a1a'), Color('e83a1a'), Color('d12c1b'), Color('d12c1b'),];
+  var configFile = `${__dirname}/../../config/showControl.json`
+  if(os.platform == 'linux') configFile = '/boot/showControl.json';
+
+  configFile = path.resolve(configFile);
 
   exports.app = {};
 
   var sent = false;
 
-  var config = {
-    numLights: 2,
-    channelsPerLight: 9,
-    serialPort: 'COM19',
-    shows:[
-      {
-        file: '../assets/data/byproducts/production.csv',
-        duration: 2.5,
-        spectrum: [[9,231,236], [58,72,180], [0,254,55]]
-      },
-      {
-        duration: .5,
-        spectrum: [[255,255,255],[255,255,255]],
-        static: true
-      },
-      {
-        file: '../assets/data/byproducts/removal.csv',
-        duration: 2.5,
-        spectrum: [[130,82,198], [180,58,58], [245,246,7]]
-      },
-      {
-        duration: .5,
-        spectrum: [[255,255,255],[255,255,255]],
-        static: true
-      }
-    ]
-  }
+  var config = require(configFile);
+
+  // var config = {
+  //   motor: {
+  //     speed: .2,
+  //     direction: 1
+  //   },
+  //   lights:[
+  //     {
+  //       zoom:0,
+  //       channel: 0
+  //     },
+  //     {
+  //       zoom:1,
+  //       channel: 0
+  //     },
+  //     {
+  //       zoom:0,
+  //       channel: 1
+  //     },
+  //     {
+  //       zoom:1,
+  //       channel: 1
+  //     }
+  //   ],
+  //   channelsPerLight: 9,
+  //   serialPort: 'COM19',
+  //   shows:[
+  //     {
+  //       file: '../assets/data/byproducts/production.csv',
+  //       duration: 13,
+  //       spectrum: spectrum,
+  //       channels: 2
+  //     },
+  //     {
+  //       duration: 2,
+  //       spectrum: [[255,255,255],[255,255,255]],
+  //       static: true,
+  //       fadeTime: 5,
+  //       channels: 2
+  //     },
+  //     {
+  //       file: '../assets/data/byproducts/removal.csv',
+  //       duration: 13,
+  //       spectrum: spectrum,
+  //       channels: 2
+  //     },
+  //     {
+  //       duration: 2,
+  //       spectrum: [[255,255,255],[255,255,255]],
+  //       static: true,
+  //       channels:2
+  //     }
+  //   ]
+  // }
 
   exports.app.start = ()=> {
+    window.motor = new MotorControl({name: 'COM20'});
+
+    motor.onready = ()=>{
+      motor.run(Math.floor(config.motor.speed));
+      motor.direction(config.motor.direction);
+      wss.addListener('motorControl', ({details, data})=> {
+        console.log('motor speed '+data.speed);
+        if (data.speed) {
+          var spd = (data.speed>127)?127:data.speed;
+          motor.run(Math.floor(spd));
+        }
+        if(data.direction){
+          motor.direction(data.direction);
+        }
+      });
+    }
     var blink = 0;
     var runTO = 0;
     window.control = new ShowControl(config);
     control.lights[0].color = '#00ff00';
     control.start();
-    // io.onChange = (val)=> {
-    //   console.log(`Pin is now ${val}`);
-    //   if (val) towers.runtime = 900000;
-    //   else towers.runtime = 10800000;
-    //   var state = 0;
-    //   clearInterval(blink);
-    //   clearTimeout(runTO);
-    //   blink = setInterval(()=> {
-    //     if (state) towers.forceColor('#0f0');
-    //     else towers.forceColor('#f0f');
-    //     state = !state;
-    //   }, 250);
-    //   runTO = setTimeout(()=> {
-    //     clearInterval(blink);
-    //     towers.run();
-    //   }, 3000);
-    // };
-    //
-    // io.onStop = (cb)=> {
-    //   towers.forceColor('#f00');
-    //   //setTimeout(cb, 1000);
-    // };
-    //
-    // io.forceCheck();
 
-    //towers.start();
-    //towers.setSpectrum([Color([255, 0, 50]), Color([50, 0, 255])]);
-    //towers.setSpectrum([Color([9,231,236]), Color([58,72,180]), Color([0,254,55])]);
-    // towers.setSpectrum([Color('d475d7'), Color('d475d7'), Color('bc5dc4'), Color('bc5dc4'), Color('8b3cb7'), Color('8b3cb7'),
-    //                     Color('6227a7'), Color('6227a7'), Color('372995'), Color('1f5dbb'),
-    //                     Color('25b7db'), Color('23d2e2'), Color('22d688'),
-    //                     Color('21be25'), Color('dddf31'),
-    //                     Color('fff837'), Color('fff837'), Color('fec62e'), Color('fec62e'), Color('f97822'), Color('f97822'),
-    //                     Color('e83a1a'), Color('e83a1a'), Color('d12c1b'), Color('d12c1b'),]);
-    // towers.setSpectrum([Color([212, 117, 215]), Color([139, 60, 183]), Color([51, 45, 149]),
-    //                     Color([38, 186, 223]), Color('8b3cb7'), Color([33, 190, 37]),
-    //                     Color([111, 205, 39]), Color([255, 255, 56]), Color([208, 41, 24]), ]);
+    wss.addListener('lightControl', ({details, data})=> {
+      if (data.lights && data.lights.length) {
+        data.lights.forEach((item, i) => {
+          control.lights[i].zoom = item.zoom;
+          console.log(`Set zoom of ${i} to ${item.zoom}`);
+        });
+      }
+    });
+
+    wss.addListener('startShow', ({details, data})=>{
+      control.start();
+    })
+
+    wss.addListener('setTime', ({details, data})=>{
+      control.setTime(data.time);
+    });
+
+    wss.addListener('writeConfig', ({details, data})=>{
+      fs.writeFileSync(configFile, JSON.stringify(data));
+      location.reload();
+    });
+
+    wss.addListener('colorPicker', ({details, data})=> {
+      console.log('here');
+      control.stop();
+      control.lights.forEach((light, i) => {
+        light.color = `rgb(${data.r},${data.g},${data.b})`;
+      });
+
+    });
+
+    wss.addListener('getConfig', ({details, data})=> {
+      wss.broadcast('config',control.config);
+    });
     console.log('started');
     //towers.runtime = 168750 * 64;//10800000;//
 

@@ -70,10 +70,14 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
 
       _this.output = fivetwelve(driver);
 
+      _this.timeOffset = 0;
+
       _this.lights = [];
 
-      for (var i = 0; i < config.numLights; i++) {
+      for (var i = 0; i < config.lights.length; i++) {
         _this.lights[i] = new Light(_this.output,1+i*config.channelsPerLight);
+        _this.lights[i].zoom = config.lights[i].zoom;
+        _this.lights[i].channel = config.lights[i].channel;
       }
 
       _this.output.start(15);
@@ -86,9 +90,9 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
           let fileRows = fs.readFileSync(path.join(__dirname,show.file)).toString().split('\n');
           data = fileRows.map(row=>row.split(','));
         } else {
-          for (var i = 0; i < 3; i++) {
+          for (var i = 0; i < 6; i++) {
             var tmp = []
-            for (let j = 0; j < config.numLights; j++) {
+            for (let j = 0; j < config.lights.length; j++) {
               tmp.push([1]);
             }
             data.push(tmp);
@@ -102,7 +106,8 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
             }
           }),
           duration: show.duration * 60000,
-          spectrum: show.spectrum.map(cols=>Color(cols))
+          spectrum: show.spectrum.map(cols=>Color(cols)),
+          channels: show.channels
         };
 
         let newShow = _this.shows[showIndex];
@@ -128,10 +133,18 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
       });
     }
 
+    setTime(currentTime){
+      this.timeOffset = currentTime - Date.now();
+    }
+
+    getTime(){
+      return Date.now() + this.timeOffset;
+    }
+
     findShow(){
       var _this = this;
       var show = _this.shows[0];
-      var off =  Date.now() % _this.runtime;
+      var off =  _this.getTime() % _this.runtime;
       //console.log(off);
       for (let i = 0; i < _this.shows.length; i++) {
         off -= _this.shows[i].duration;
@@ -150,7 +163,7 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
       _this.running;
       _this.showIndex = 0;
       _this.runtime = _this.shows.reduce((tot, show)=>tot + show.duration, 0);
-      _this.offset = Date.now() % _this.runtime;
+      _this.offset = _this.getTime() % _this.runtime;
 
       var show = _this.findShow();
 
@@ -161,14 +174,14 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
 
       if (_this.runInterval) clearInterval(_this.runInterval);
       _this.runInterval = setInterval(()=> {
-        var remaining = (show.endTime - Date.now());
+        var remaining = (show.endTime - _this.getTime());
         var elapsed = show.duration - remaining;
         if(remaining < 0){
           show = _this.findShow();
         }
         let which = Math.floor(show.data.length * (elapsed) / show.duration);
         let prc = (elapsed % show.period) / show.period;
-        for (var i = 0; i < _this.config.numLights; i++) {
+        for (var i = 0; i < show.channels; i++) {
           if(which < show.data.length){
             let point = show.data[which];
             let next = _this.nextPoint(_this.showIndex,which);
@@ -176,9 +189,15 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
             var nScale = (next.raw[i]==0)?0:1;
             //if(i && last != point.raw[i]) last=point.raw[i],console.log(point.raw[i], elapsed/show.duration);
             var color = fadeColors([point.colors[i].scale(pScale), next.colors[i].scale(nScale)], prc);
-            _this.lights[i].color = color.styleString();
-            var current = (next.norm[i]*(prc) + point.norm[i]*(1-prc));
-            _this.lights[i].display.marker.style.left = Math.floor(current * 100) + '%';
+            _this.lights.forEach(light => {
+              if(light.channel == i){
+                light.color = color.styleString();
+                var current = (next.norm[i]*(prc) + point.norm[i]*(1-prc));
+                light.display.marker.style.left = Math.floor(current * 100) + '%';
+              }
+            });
+
+
           }
         }
       }, fps/1000);
@@ -211,7 +230,7 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
 
       show.period = show.duration / show.data.length;
 
-      show.endTime = Date.now() - offset;
+      show.endTime = _this.getTime() - offset;
 
       //console.log("next change in " + (show.duration - (Date.now() - show.startTime))/1000 )
 
