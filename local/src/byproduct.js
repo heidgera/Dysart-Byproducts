@@ -9,9 +9,6 @@ var obtains = [
 ];
 
 obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetwelve, param, DmxDevice }, usbProDriver,path)=> {
-
-  console.log(fivetwelve);
-
   class Light{
     constructor(output, address){
       var _this = this;
@@ -88,12 +85,11 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
         let data = [];
         if(show.file){
           let fileRows = fs.readFileSync(path.join(__dirname,show.file)).toString().split('\n');
-          data = fileRows.map(row=>row.split(','));
+          data = fileRows.filter(el=>el.length>0).map(row=>row.split(','));
         } else {
-          for (var i = 0; i < 6; i++) {
-            data.push(Array(show.channels).fill(1));
-          }
-
+          console.log(show);
+          console.log(Math.floor((show.duration * 60) / show.fadeTime));
+          data = Array(Math.floor((show.duration*60) / show.fadeTime)).fill(Array(show.channels).fill(1));
         }
         _this.shows[showIndex] = {
           data: data.map(raw=>{
@@ -119,11 +115,7 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
         newShow.data.forEach((datum, dataIndex) => {
           if(min == max) newShow.data[dataIndex].norm = datum.raw.map(val=>1);
           else newShow.data[dataIndex].norm = datum.raw.map(val=>(val-min)/(max-min));
-          newShow.data[dataIndex].colors = newShow.data[dataIndex].norm.map(norm=>{
-            return fadeColors(newShow.spectrum, norm)
-          }
-
-          );
+          newShow.data[dataIndex].colors = newShow.data[dataIndex].norm.map(norm=>fadeColors(newShow.spectrum, norm));
         });
 
       });
@@ -185,9 +177,9 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
             var nScale = (next.raw[i]==0)?0:1;
             var blk = pScale*(1-prc) + nScale*prc;
             //if(i && last != point.raw[i]) last=point.raw[i],console.log(point.raw[i], elapsed/show.duration);
-            //var color = fadeColors([point.colors[i].scale(pScale), next.colors[i].scale(nScale)], prc);
+            var color = fadeColors([point.colors[i], next.colors[i]], prc);
             var current = (next.norm[i]*(prc) + point.norm[i]*(1-prc));
-            var color = fadeColors(show.spectrum, current);
+            //var color = fadeColors(show.spectrum, current);
             color = color.scale(blk);
             _this.lights.forEach(light => {
               if(light.channel == i){
