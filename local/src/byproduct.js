@@ -91,11 +91,7 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
           data = fileRows.map(row=>row.split(','));
         } else {
           for (var i = 0; i < 6; i++) {
-            var tmp = []
-            for (let j = 0; j < config.lights.length; j++) {
-              tmp.push(1);
-            }
-            data.push(tmp);
+            data.push(Array(show.channels).fill(1));
           }
 
         }
