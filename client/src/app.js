@@ -149,6 +149,28 @@ obtain(['µ/commandClient.js'], ({ MuseControl })=> {
       µ('#rotDir').checked = data.motor.direction;
       µ('#ballSpeed').value = data.motor.speed;
 
+      var days = ['Sun:','Mon:','Tue:','Wed:','Thu:','Fri:','Sat:'];
+      var times = µ('#timingHolder');
+      config.active.forEach((day, i) => {
+        var hld = µ('+p',times);
+        let lbl = µ('+label',hld);
+        lbl.textContent = days[i];
+        var strt = µ('+input',hld);
+        strt.type = 'number';
+        strt.value = day.start;
+        var end = µ('+input',hld);
+        end.type = 'number';
+        end.value = day.end;
+
+        strt.onchange = ()=>{
+          config.active[i].start = strt.value;
+        }
+        end.onchange = ()=>{
+          config.active[i].end = end.value;
+        }
+      });
+
+
       var devs = lights.devices;
       config.lights.forEach((light, i) => {
         let next = µ('+div',lights);

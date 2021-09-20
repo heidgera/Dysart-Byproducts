@@ -180,8 +180,9 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
             //var color = fadeColors(show.spectrum, current);
             color = color.scale(blk);
             _this.lights.forEach(light => {
-              var adjHours = (new Date(_this.getTime())).getHours();
-              if(adjHours >= _this.config.active.start && adjHours < _this.config.active.end){
+              var adj = new Date(_this.getTime());
+              var active = _this.config.active[adj.getDay()];
+              if(adj.getHours() >= active.start && adj.getHours() < active.end){
                 if(light.channel == i){
                   light.color = color.styleString();
                   //var current = (next.norm[i]*(prc) + point.norm[i]*(1-prc));
