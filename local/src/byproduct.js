@@ -87,8 +87,6 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
           let fileRows = fs.readFileSync(path.join(__dirname,show.file)).toString().split('\n');
           data = fileRows.filter(el=>el.length>0).map(row=>row.split(','));
         } else {
-          console.log(show);
-          console.log(Math.floor((show.duration * 60) / show.fadeTime));
           data = Array(Math.floor((show.duration*60) / show.fadeTime)).fill(Array(show.channels).fill(1));
         }
         _this.shows[showIndex] = {

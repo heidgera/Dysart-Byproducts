@@ -44,33 +44,37 @@ obtain(obtains, ({ ShowControl }, { Color }, {fileServer}, {wss}, {MotorControl}
     serial.list().then(ports=>{
       ports.forEach((port, i) => {
         if(port.vendorId == '1B4F') motorPort = port.path;
-        else if(port.vendorId = '0403') config.serialPort = port.path;
+        if(port.vendorId == '0403') config.serialPort = port.path;
       });
 
+      console.log(config.serialPort + ' for the dmx');
+      window.control = new ShowControl(config);
+      control.lights[0].color = '#00ff00';
+      control.start();
+
+      window.motor = new MotorControl({name: motorPort});
+      motor.onready = ()=>{
+        motor.run(Math.floor(config.motor.speed));
+        motor.direction(config.motor.direction);
+        wss.addListener('motorControl', ({details, data})=> {
+          console.log('motor speed '+data.speed);
+          if (data.speed) {
+            var spd = (data.speed>127)?127:data.speed;
+            motor.run(Math.floor(spd));
+          }
+          if(data.direction){
+            motor.direction(data.direction);
+          }
+        });
+      }
     })
 
-    window.motor = new MotorControl({name: motorPort});
 
 
-    motor.onready = ()=>{
-      motor.run(Math.floor(config.motor.speed));
-      motor.direction(config.motor.direction);
-      wss.addListener('motorControl', ({details, data})=> {
-        console.log('motor speed '+data.speed);
-        if (data.speed) {
-          var spd = (data.speed>127)?127:data.speed;
-          motor.run(Math.floor(spd));
-        }
-        if(data.direction){
-          motor.direction(data.direction);
-        }
-      });
-    }
+
+
     var blink = 0;
     var runTO = 0;
-    window.control = new ShowControl(config);
-    control.lights[0].color = '#00ff00';
-    control.start();
 
     wss.addListener('lightControl', ({details, data})=> {
       if (data.lights && data.lights.length) {
