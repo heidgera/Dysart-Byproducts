@@ -93,7 +93,7 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
           for (var i = 0; i < 6; i++) {
             var tmp = []
             for (let j = 0; j < config.lights.length; j++) {
-              tmp.push([1]);
+              tmp.push(1);
             }
             data.push(tmp);
           }
