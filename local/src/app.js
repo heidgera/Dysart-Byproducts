@@ -14,11 +14,12 @@ var obtains = [
   './src/controller.js',
   'os',
   'path',
-  'fs'
+  'fs',
+  'serialport'
   /*`${__dirname}/stateManager.js`,*/
 ];
 
-obtain(obtains, ({ ShowControl }, { Color }, {fileServer}, {wss}, {MotorControl}, os, path, fs/*, io*/)=> {
+obtain(obtains, ({ ShowControl }, { Color }, {fileServer}, {wss}, {MotorControl}, os, path, fs, serial/*, io*/)=> {
   var spectrum = [ Color('8b3cb7'), Color('8b3cb7'),
                           Color('6227a7'), Color('6227a7'), Color('372995'), Color('1f5dbb'),
                           Color('25b7db'), Color('23d2e2'), Color('22d688'),
@@ -36,62 +37,19 @@ obtain(obtains, ({ ShowControl }, { Color }, {fileServer}, {wss}, {MotorControl}
 
   var config = require(configFile);
 
-  // var config = {
-  //   motor: {
-  //     speed: .2,
-  //     direction: 1
-  //   },
-  //   lights:[
-  //     {
-  //       zoom:0,
-  //       channel: 0
-  //     },
-  //     {
-  //       zoom:1,
-  //       channel: 0
-  //     },
-  //     {
-  //       zoom:0,
-  //       channel: 1
-  //     },
-  //     {
-  //       zoom:1,
-  //       channel: 1
-  //     }
-  //   ],
-  //   channelsPerLight: 9,
-  //   serialPort: 'COM19',
-  //   shows:[
-  //     {
-  //       file: '../assets/data/byproducts/production.csv',
-  //       duration: 13,
-  //       spectrum: spectrum,
-  //       channels: 2
-  //     },
-  //     {
-  //       duration: 2,
-  //       spectrum: [[255,255,255],[255,255,255]],
-  //       static: true,
-  //       fadeTime: 5,
-  //       channels: 2
-  //     },
-  //     {
-  //       file: '../assets/data/byproducts/removal.csv',
-  //       duration: 13,
-  //       spectrum: spectrum,
-  //       channels: 2
-  //     },
-  //     {
-  //       duration: 2,
-  //       spectrum: [[255,255,255],[255,255,255]],
-  //       static: true,
-  //       channels:2
-  //     }
-  //   ]
-  // }
-
   exports.app.start = ()=> {
-    window.motor = new MotorControl({name: 'COM20'});
+    var motorPort = 'COM20'
+
+    serial.list().then(ports=>{
+      ports.forEach((port, i) => {
+        if(port.vendorId == '1B4F') motorPort = port.path;
+        else if(port.vendorId = '0403') config.serialPort = port.path;
+      });
+
+    })
+
+    window.motor = new MotorControl({name: motorPort});
+
 
     motor.onready = ()=>{
       motor.run(Math.floor(config.motor.speed));
