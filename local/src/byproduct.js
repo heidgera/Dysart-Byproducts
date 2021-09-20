@@ -188,11 +188,13 @@ obtain(obtains, (fs, { Color, fadeColors }, utils, Serialport, { default: fivetw
             var pScale = (point.raw[i]==0)?0:1;
             var nScale = (next.raw[i]==0)?0:1;
             //if(i && last != point.raw[i]) last=point.raw[i],console.log(point.raw[i], elapsed/show.duration);
-            var color = fadeColors([point.colors[i].scale(pScale), next.colors[i].scale(nScale)], prc);
+            //var color = fadeColors([point.colors[i].scale(pScale), next.colors[i].scale(nScale)], prc);
+            var current = (next.norm[i]*(prc) + point.norm[i]*(1-prc));
+            var color = fadeColors(show.spectrum, current);
             _this.lights.forEach(light => {
               if(light.channel == i){
                 light.color = color.styleString();
-                var current = (next.norm[i]*(prc) + point.norm[i]*(1-prc));
+                //var current = (next.norm[i]*(prc) + point.norm[i]*(1-prc));
                 light.display.marker.style.left = Math.floor(current * 100) + '%';
               }
             });
